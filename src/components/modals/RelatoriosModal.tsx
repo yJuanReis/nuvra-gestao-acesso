@@ -276,10 +276,10 @@ export function RelatoriosModal({ open, onOpenChange }: RelatoriosModalProps) {
     doc.setTextColor(255, 255, 255); // Branco
     doc.text(`Relatório de Controle de Acesso`, pageWidth / 2, 14, { align: 'center' });
     
-    // Subtítulo com nome da empresa (com prefixo BR Marinas)
+    // Subtítulo com nome da empresa
     doc.setFontSize(12);
     doc.setFont(undefined, 'normal');
-    doc.text(`BR Marinas | ${empresa.nome}`, pageWidth / 2, 22, { align: 'center' });
+    doc.text(`${empresa.nome}`, pageWidth / 2, 22, { align: 'center' });
     
     // Período do relatório (canto esquerdo)
     doc.setFontSize(9);

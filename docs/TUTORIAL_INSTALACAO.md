@@ -20,8 +20,8 @@ Antes de começar, você precisa ter:
 
 ```bash
 # Clone o projeto
-git clone https://github.com/yJuanReis/controle-brmarinas.git
-cd controle-brmarinas
+git clone https://github.com/yJuanReis/nuvra-gestao-acesso.git
+cd nuvra-gestao-acesso
 
 # Instalar as dependências
 npm install

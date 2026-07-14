@@ -751,7 +751,7 @@ export function AdminPanel() {
                       <div className="space-y-2">
                         <div className="font-semibold text-sm">Acesso ao Supabase</div>
                         <div className="text-xs space-y-1">
-                          <div><strong>Email:</strong> suporte@brmarinas.com.br</div>
+                          <div><strong>Email:</strong> suporte@nuvra.com</div>
                           <div><strong>Senha:</strong> padrão</div>
                           <div className="text-blue-600 font-medium">Clique para abrir painel</div>
                         </div>
