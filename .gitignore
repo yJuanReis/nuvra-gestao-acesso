@@ -63,6 +63,8 @@ bun.lockb
 
 #SQL com dados sensíveis (não commitar arquivos .sql que contenham dados reais)
 *.sql
+# Exceção: scripts de setup/documentação (sem dados reais, devem ir pro repo)
+!docs/*.sql
 
 # Pasta do Supabase - manter apenas migrações (não
 supabase/

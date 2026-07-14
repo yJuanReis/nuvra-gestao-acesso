@@ -273,6 +273,11 @@ ALTER TABLE tipos_pessoa  DISABLE ROW LEVEL SECURITY;
 
 ### 2.6. Criar Primeiro Usuário Admin
 
+> ✅ **Já usou o [`SETUP_SUPABASE_DEMO.sql`](./SETUP_SUPABASE_DEMO.sql) completo?**
+> Ele já cria `admin@nuvra.com` / `admin123` (owner). Pule direto para o
+> Passo 3. Se o bloco de admin falhou (schema do Auth varia por versão),
+> siga o passo manual abaixo.
+
 1. No menu lateral, vá em **"Authentication" → "Users"**
 2. Clique em **"Add user"**
 3. Preencha:
