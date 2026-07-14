@@ -26,7 +26,7 @@ export function validateCPF(value: string): { isValid: boolean; formatted: strin
     sum += parseInt(cleanValue.charAt(i)) * (10 - i);
   }
   let remainder = 11 - (sum % 11);
-  let digit = remainder > 9 ? 0 : remainder;
+  const digit = remainder > 9 ? 0 : remainder;
 
   // Calcula o segundo dígito verificador
   sum = 0;

@@ -58,6 +58,7 @@ export function useAuth(): UseAuthReturn {
         if (!mounted) return;
 
         if (error) {
+          // sessão inválida/ausente — tratada como não autenticado abaixo
         } else if (session?.user) {
           await handleAuthStateChange(session.user);
           setInitialSessionProcessed(true);
@@ -273,6 +274,7 @@ export function useAuth(): UseAuthReturn {
       }
 
       if (!profileCreated) {
+        // perfil não criado após retries — o trigger do banco cobre esse caso
       }
 
       // Após signup, verificar se a sessão atual mudou para o novo usuário
@@ -289,6 +291,7 @@ export function useAuth(): UseAuthReturn {
             });
 
             if (setErr) {
+              // falha ao restaurar sessão anterior — segue com a sessão atual
               } else {
                 try {
                 // Reaplicar estado de usuário a partir da sessão restaurada
@@ -297,6 +300,7 @@ export function useAuth(): UseAuthReturn {
                 }
             }
           } else {
+            // sessão anterior sem tokens — nada a restaurar
             }
         }
       } catch (restoreErr) {
@@ -324,11 +328,8 @@ export function useAuth(): UseAuthReturn {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
-          // Se for erro de sessão faltante, ignorar e continuar com logout local
-          if (error.message && error.message.includes('session')) {
-            } else {
-          }
-        } else {
+          // erro no signOut do Supabase (ex.: sessão faltante) — ignora e
+          // segue com o logout local abaixo
         }
       } catch (err: any) {
       }
@@ -402,11 +403,10 @@ export function useAuth(): UseAuthReturn {
     if (!user?.id) return;
 
     try {
-      const userProfile = await loadProfile(user.id);
-
-      if (userProfile) {
-      }
+      // loadProfile já atualiza o estado do perfil internamente
+      await loadProfile(user.id);
     } catch (err) {
+      console.error('Erro ao recarregar perfil:', err);
     }
   }, [user?.id, loadProfile]);
 

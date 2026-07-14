@@ -102,77 +102,63 @@ export function useProfile() {
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!profile) return null;
 
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .update({
-          nome: updates.nome,
-          empresa_id: updates.empresa_id,
-          role: updates.role,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', profile.id)
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update({
+        nome: updates.nome,
+        empresa_id: updates.empresa_id,
+        role: updates.role,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', profile.id)
+      .select()
+      .single();
 
-      if (error) throw error;
+    if (error) throw error;
 
-      const updatedProfile: UserProfile = {
-        id: data.id,
-        nome: data.nome,
-        empresa_id: data.empresa_id,
-        role: data.role as 'user' | 'admin' | 'owner',
-        created_at: data.created_at
-      };
+    const updatedProfile: UserProfile = {
+      id: data.id,
+      nome: data.nome,
+      empresa_id: data.empresa_id,
+      role: data.role as 'user' | 'admin' | 'owner',
+      created_at: data.created_at
+    };
 
-      setProfile(updatedProfile);
-      return updatedProfile;
-    } catch (err) {
-      throw err;
-    }
+    setProfile(updatedProfile);
+    return updatedProfile;
   };
 
   // Criar perfil (usado durante signup)
   const createProfile = async (userId: string, profileData: Omit<UserProfile, 'id' | 'created_at'>) => {
-    try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: userId,
+        nome: profileData.nome,
+        empresa_id: profileData.empresa_id,
+        role: profileData.role
+      })
+      .select()
+      .single();
 
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: userId,
-          nome: profileData.nome,
-          empresa_id: profileData.empresa_id,
-          role: profileData.role
-        })
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data) {
-        throw new Error('Nenhum dado retornado após criar perfil');
-      }
-
-
-      const newProfile: UserProfile = {
-        id: data.id,
-        nome: data.nome,
-        empresa_id: data.empresa_id,
-        role: data.role as 'user' | 'admin' | 'owner',
-        created_at: data.created_at
-      };
-
-      setProfile(newProfile);
-      return newProfile;
-    } catch (err: any) {
-      
-      // Log detalhado do erro
-      
-      // Re-lançar o erro para tratamento na camada superior
-      throw err;
+    if (error) {
+      throw error;
     }
+
+    if (!data) {
+      throw new Error('Nenhum dado retornado após criar perfil');
+    }
+
+    const newProfile: UserProfile = {
+      id: data.id,
+      nome: data.nome,
+      empresa_id: data.empresa_id,
+      role: data.role as 'user' | 'admin' | 'owner',
+      created_at: data.created_at
+    };
+
+    setProfile(newProfile);
+    return newProfile;
   };
 
   // Limpar perfil (logout)

@@ -22,47 +22,36 @@ const App = () => {
 
   // Protected Route para usuários autenticados
   function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    try {
-      const { isAuthenticated } = useNuvra();
-      if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-      }
-      return <>{children}</>;
-    } catch (err) {
+    const { isAuthenticated } = useNuvra();
+    if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
+    return <>{children}</>;
   }
 
   // Protected Route para admin e dono
   function AdminRoute({ children }: { children: React.ReactNode }) {
-    try {
-      const { isAuthenticated, user } = useNuvra();
-      if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-      }
-      if (user?.profile?.role !== 'admin' && user?.profile?.role !== 'owner') {
-        return <Navigate to="/" replace />;
-      }
-      return <>{children}</>;
-    } catch (err) {
+    const { isAuthenticated, user } = useNuvra();
+    if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
+    if (user?.profile?.role !== 'admin' && user?.profile?.role !== 'owner') {
+      return <Navigate to="/" replace />;
+    }
+    return <>{children}</>;
   }
 
   // Layout das rotas
   function AppRoutes() {
-    try {
-      const { authLoading, isAuthenticated, user } = useNuvra();
+    const { authLoading, isAuthenticated, user } = useNuvra();
 
+    // Mostra loading screen apenas durante inicialização
+    if (authLoading) {
+      return <LoadingPage />;
+    }
 
-      // Mostra loading screen apenas durante inicialização
-      if (authLoading) {
-        return <LoadingPage />;
-      }
-
-
-      return (
-        <Routes>
+    return (
+      <Routes>
           {/* Login - redireciona se já estiver autenticado */}
           <Route
             path="/login"
@@ -114,10 +103,6 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       );
-    } catch (err) {
-      // Se houver erro de contexto, mostrar login como fallback
-      return <LoginPage />;
-    }
   }
 
   return (

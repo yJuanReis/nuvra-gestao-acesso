@@ -160,6 +160,7 @@ export class NuvraService {
 
       return pessoasProximas;
     } catch (error) {
+      console.error('Erro ao verificar pessoas próximas do limite:', error);
       throw error;
     }
   }
@@ -225,6 +226,7 @@ export class NuvraService {
         tempoMedio: Math.floor(tempoMedio / (1000 * 60 * 60)) // Em horas
       };
     } catch (error) {
+      console.error('Erro ao obter estatísticas de permanência:', error);
       throw error;
     }
   }

@@ -21,6 +21,12 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
+      // `any` é usado de forma idiomática em handlers de erro e nos genéricos
+      // do Supabase; mantemos como aviso em vez de erro.
+      "@typescript-eslint/no-explicit-any": "warn",
+      // Catch vazio é aceitável (fallback silencioso); demais blocos vazios
+      // continuam sendo erro.
+      "no-empty": ["error", { allowEmptyCatch: true }],
     },
   },
 );

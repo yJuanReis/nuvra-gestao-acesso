@@ -60,7 +60,6 @@ export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }:
         setConfirmandoSaida(null);
         setHorarioSaida('');
         setObservacaoConfirm('');
-      } else {
       }
     } catch (error) {
     }
