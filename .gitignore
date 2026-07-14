@@ -70,3 +70,6 @@ supabase/
 # Arquivos de backup locais
 *.backup
 *.bak
+
+# Supabase CLI temp
+supabase/.temp/
