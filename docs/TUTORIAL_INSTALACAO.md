@@ -121,6 +121,7 @@ CREATE INDEX IF NOT EXISTS idx_tipos_pessoa_empresa ON tipos_pessoa(empresa_id);
 CREATE INDEX IF NOT EXISTS idx_movimentacoes_pessoa ON movimentacoes(pessoa_id);
 CREATE INDEX IF NOT EXISTS idx_movimentacoes_status ON movimentacoes(status);
 CREATE INDEX IF NOT EXISTS idx_movimentacoes_data ON movimentacoes(entrada_em);
+CREATE INDEX IF NOT EXISTS idx_movimentacoes_excluido_em ON movimentacoes(excluido_em);
 CREATE INDEX IF NOT EXISTS idx_pessoas_empresa ON pessoas(empresa_id);
 CREATE INDEX IF NOT EXISTS idx_pessoas_documento ON pessoas(documento);
 
@@ -238,33 +239,67 @@ CREATE TRIGGER on_auth_user_created
   EXECUTE FUNCTION handle_new_user();
 ```
 
+> 💡 **Atalho:** o script completo acima também está pronto em
+> [`SETUP_SUPABASE_DEMO.sql`](./SETUP_SUPABASE_DEMO.sql) — você pode colar
+> aquele arquivo inteiro de uma vez (ele já inclui empresa demo, tipos e RLS).
+
 ### 2.4. Criar Empresa Padrão
 
-No SQL Editor, execute:
+A coluna `id` de `empresas` é do tipo **UUID** — não use texto como `'nuvra'`.
+No SQL Editor, execute (usamos um UUID fixo para o demo):
 
 ```sql
 INSERT INTO empresas (id, nome)
-VALUES ('nuvra', 'Nuvra');
+VALUES ('00000000-0000-0000-0000-000000000001', 'Nuvra Demo')
+ON CONFLICT (id) DO NOTHING;
 ```
 
-### 2.5. Criar Primeiro Usuário Admin
+### 2.5. Desabilitar RLS (apenas para o DEMO)
+
+Em alguns projetos o **Row Level Security (RLS)** vem ligado por padrão e
+bloqueia a leitura via chave anônima — o app fica preso na tela de login
+(perfil retorna `null`). Para o demo, desligue o RLS:
+
+```sql
+ALTER TABLE empresas      DISABLE ROW LEVEL SECURITY;
+ALTER TABLE pessoas       DISABLE ROW LEVEL SECURITY;
+ALTER TABLE movimentacoes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE tipos_pessoa  DISABLE ROW LEVEL SECURITY;
+```
+
+> ⚠️ **Produção:** não deixe RLS desligado. Habilite RLS e crie policies
+> por `empresa_id` para isolar os dados de cada estabelecimento.
+
+### 2.6. Criar Primeiro Usuário Admin
 
 1. No menu lateral, vá em **"Authentication" → "Users"**
 2. Clique em **"Add user"**
 3. Preencha:
    - **Email**: `admin@nuvra.com`
    - **Password**: `admin123`
+   - Marque **"Auto Confirm User"** (senão o login falha por email não confirmado)
 4. Clique em **"Create user"**
 
-Agora precisamos vincular este usuário à empresa. No SQL Editor:
+O trigger `handle_new_user` já cria um perfil para esse usuário (com role
+`user`). Precisamos **promovê-lo a owner** e garantir a empresa. No SQL Editor:
 
 ```sql
 -- Descubra o ID do usuário que você acabou de criar
 SELECT id, email FROM auth.users;
 
--- Substitua 'ID_DO_USUARIO' pelo ID encontrado acima
+-- Vincula/promove o usuário a owner da empresa demo.
+-- O ON CONFLICT cobre o caso do perfil já ter sido criado pelo trigger.
 INSERT INTO user_profiles (id, nome, empresa_id, role)
-VALUES ('ID_DO_USUARIO', 'Administrador', 'nuvra', 'owner');
+VALUES (
+  'ID_DO_USUARIO',
+  'Administrador',
+  '00000000-0000-0000-0000-000000000001',
+  'owner'
+)
+ON CONFLICT (id) DO UPDATE
+  SET role = 'owner',
+      empresa_id = '00000000-0000-0000-0000-000000000001';
 ```
 
 ---

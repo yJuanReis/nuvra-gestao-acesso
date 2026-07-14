@@ -4,32 +4,23 @@ Um sistema profissional web para controle de entrada e saída de pessoas em esta
 
 ## 🚀 Quick Start
 
-### **Opção 1: Demo Rápido (Modo Desenvolvimento)**
-```bash
-npm install
-npm run dev
-```
+O app usa **Supabase** como backend (auth + banco). Não há modo mock: é
+preciso um projeto Supabase configurado antes de rodar.
 
-Acesse: `http://localhost:5173`
+#### **1. Configurar o Supabase**
+No SQL Editor do seu projeto, cole e execute o script completo:
 
-**Demo Login**: Qualquer email/senha funciona
+- [`docs/SETUP_SUPABASE_DEMO.sql`](./docs/SETUP_SUPABASE_DEMO.sql)
 
-### **Opção 2: Produção Completa (Supabase)**
-
-#### **1. Configurar Supabase**
-```bash
-# Execute estes scripts no SQL Editor do Supabase:
-1. database_setup.sql
-2. database_fix.sql
-3. database_final_fix.sql
-4. add_owner_user.sql
-```
+Ele cria tabelas, índices, funções, trigger, a empresa demo, os tipos de
+pessoa e ajusta o RLS. Depois crie o usuário admin seguindo o
+[Tutorial de Instalação](./docs/TUTORIAL_INSTALACAO.md) (passos 2.6+).
 
 #### **2. Configurar Ambiente**
 ```bash
-# Crie arquivo .env.local:
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+# Crie o arquivo .env.local na raiz:
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-anon-key
 ```
 
 #### **3. Executar**
@@ -38,9 +29,10 @@ npm install
 npm run dev
 ```
 
-**Login Produção:**
-- Email: `admin@empresa.com`
-- Senha: `admin123`
+Acesse `http://localhost:5173` e faça login com o admin criado no passo 1
+(ex.: `admin@nuvra.com` / `admin123`).
+
+📖 Guia completo, passo a passo: [`docs/TUTORIAL_INSTALACAO.md`](./docs/TUTORIAL_INSTALACAO.md)
 
 ---
 
@@ -62,7 +54,7 @@ Toda a documentação está em [`./docs`](./docs/):
 
 ## ✨ Funcionalidades
 
-- ✅ **Login & Autenticação** - Demo funcional
+- ✅ **Login & Autenticação** - Supabase Auth
 - ✅ **Cadastro de Pessoas** - Compartilhadas entre empresas
 - ✅ **Registrar Entrada/Saída** - Com validações
 - ✅ **Histórico** - Com 5 filtros avançados
@@ -89,8 +81,9 @@ Toda a documentação está em [`./docs`](./docs/):
 ├── src/
 │   ├── components/          # React components
 │   ├── contexts/            # Estado global (NuvraContext)
+│   ├── hooks/              # Hooks (useAuth, useProfile...)
+│   ├── services/           # Acesso ao Supabase (nuvraService)
 │   ├── types/              # TypeScript types
-│   ├── data/               # Mock data
 │   └── pages/              # Rotas
 ├── package.json
 └── tsconfig.json
@@ -120,7 +113,7 @@ npm run dev
 ```
 
 ### 3. Explore o Sistema
-- Login: qualquer email/senha
+- Login: use o admin criado no Supabase (ex.: `admin@nuvra.com`)
 - Cadastre uma pessoa
 - Registre entrada
 - Registre saída

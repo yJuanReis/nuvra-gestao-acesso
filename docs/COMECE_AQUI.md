@@ -30,9 +30,10 @@ npm install
 npm run dev
 ```
 
-### 2. Teste a Demo
+### 2. Acesse o App
 - Abra seu navegador e acesse: `http://localhost:5173`
-- **Login Demo**: Qualquer email e senha funcionam
+- **Login**: use o usuário admin criado no Supabase (ex.: `admin@nuvra.com`)
+  — veja o Passo 3. Não há login mock: o app exige Supabase configurado.
 - Explore as funcionalidades básicas
 
 ## 📋 Passo 3: Configuração Básica (5 minutos)
@@ -48,11 +49,10 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 ### Banco de Dados (Supabase)
 1. Crie uma conta no [Supabase](https://supabase.com)
 2. Crie um novo projeto
-3. Execute os scripts SQL no SQL Editor:
-   - `database_setup.sql`
-   - `database_fix.sql`
-   - `database_final_fix.sql`
-   - `add_owner_user.sql`
+3. No SQL Editor, cole e execute o script completo:
+   - [`SETUP_SUPABASE_DEMO.sql`](./SETUP_SUPABASE_DEMO.sql)
+4. Crie o usuário admin e promova a owner seguindo o
+   [Tutorial de Instalação](./TUTORIAL_INSTALACAO.md) (passos 2.6+)
 
 ## 📋 Passo 4: Primeiro Uso (10 minutos)
 
