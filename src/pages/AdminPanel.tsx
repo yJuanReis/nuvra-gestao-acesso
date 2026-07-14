@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,15 +64,17 @@ import {
   Lock,
   ArrowRightLeft,
   Eye,
+  Tags,
 } from 'lucide-react';
 import { AdicionarUsuarioModal } from '@/components/modals/AdicionarUsuarioModal';
 import { AlterarSenhaModal } from '@/components/modals/AlterarSenhaModal';
 import { RelatoriosModal } from '@/components/modals/RelatoriosModal';
+import { GerenciarTiposPessoaModal, GerenciarTiposPessoaPanel } from '@/components/modals/GerenciarTiposPessoaModal';
 import { Navigate } from 'react-router-dom';
-import { AppUser } from '@/types/marina';
+import { AppUser } from '@/types/nuvra';
 
 export function AdminPanel() {
-  const { user, empresaAtual, logout, empresas, pessoas, movimentacoes, getUsuarios, adicionarUsuario, removerUsuario, alterarSenhaUsuario, deletarEmpresa } = useMarina();
+  const { user, empresaAtual, logout, empresas, pessoas, movimentacoes, getUsuarios, adicionarUsuario, removerUsuario, alterarSenhaUsuario, deletarEmpresa } = useNuvra();
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState<string | null>(null);
@@ -84,6 +86,7 @@ export function AdminPanel() {
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showRelatoriosModal, setShowRelatoriosModal] = useState(false);
+  const [showTiposPessoaModal, setShowTiposPessoaModal] = useState(false);
 
   // Pagination states
   const [empresasCurrentPage, setEmpresasCurrentPage] = useState(1);
@@ -227,6 +230,10 @@ export function AdminPanel() {
                     <Users className="h-4 w-4" />
                     <span className="hidden sm:inline">Usuários</span>
                   </TabsTrigger>
+                  <TabsTrigger value="tipos" className="flex items-center gap-2">
+                    <Tags className="h-4 w-4" />
+                    <span className="hidden sm:inline">Tipos</span>
+                  </TabsTrigger>
                   <TabsTrigger value="configuracoes" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     <span className="hidden sm:inline">Info</span>
@@ -263,7 +270,7 @@ export function AdminPanel() {
                         {usuarios.filter(u => u.empresa_id === user?.empresa_id).length}
                       </p>
                       <p className="text-xs text-green-700 mt-1">
-                        Empresa: {empresaAtual?.nome || 'Marina não encontrada'} ({user?.empresa_id})
+                        Empresa: {empresaAtual?.nome || 'Marina não encontrada'}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
@@ -325,7 +332,6 @@ export function AdminPanel() {
                   <Users className="h-6 w-6" />
                   <span>Ver Relatórios</span>
                 </Button>
-
 
               </div>
 
@@ -577,7 +583,9 @@ export function AdminPanel() {
                             </div>
                             <div>
                               <h3 className="font-semibold text-lg text-slate-900">{usuario.nome}</h3>
-                              <p className="text-sm text-slate-500">{usuario.email}</p>
+                              {usuario.email && (
+                                <p className="text-sm text-slate-500">{usuario.email}</p>
+                              )}
                               <p className="text-xs text-slate-400">
                                 Empresa: {empresas.find(e => e.id === usuario.empresa_id)?.nome || usuario.empresa_id || 'Não associada'}
                               </p>
@@ -691,6 +699,22 @@ export function AdminPanel() {
                 )}
               </>
             )}
+          </TabsContent>
+
+
+          {/* Tipos de Pessoa Tab */}
+          <TabsContent value="tipos" className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">Tipos de Pessoa</h2>
+              <p className="text-sm text-slate-500">
+                Crie e personalize os tipos de pessoa do seu estabelecimento
+              </p>
+            </div>
+            <Card>
+              <CardContent className="p-6">
+                <GerenciarTiposPessoaPanel />
+              </CardContent>
+            </Card>
           </TabsContent>
 
 
@@ -922,6 +946,12 @@ export function AdminPanel() {
       <RelatoriosModal
         open={showRelatoriosModal}
         onOpenChange={setShowRelatoriosModal}
+      />
+
+      {/* Tipos de Pessoa Modal */}
+      <GerenciarTiposPessoaModal
+        open={showTiposPessoaModal}
+        onOpenChange={setShowTiposPessoaModal}
       />
 
       {/* Change Password Modal */}

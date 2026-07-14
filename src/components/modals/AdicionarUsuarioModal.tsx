@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { UserPlus, Mail, Lock, Building2, Shield } from 'lucide-react';
 
 interface AdicionarUsuarioModalProps {
@@ -12,7 +12,7 @@ interface AdicionarUsuarioModalProps {
 }
 
 export function AdicionarUsuarioModal({ open, onOpenChange }: AdicionarUsuarioModalProps) {
-  const { adicionarUsuario, empresas } = useMarina();
+  const { adicionarUsuario, empresas } = useNuvra();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',

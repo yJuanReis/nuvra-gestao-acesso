@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useMarina } from '@/contexts/MarinaContext';
-import { PessoaDentro } from '@/types/marina';
+import { useNuvra } from '@/contexts/NuvraContext';
+import { PessoaDentro } from '@/types/nuvra';
 import { UserTypeAvatar } from '@/lib/userTypeIcons';
 import { LogOut, Check, MessageSquare, Search, X, History, User, Phone, Car, Clock, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
@@ -19,7 +19,7 @@ interface RegistrarSaidaEmLoteModalProps {
 }
 
 export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }: RegistrarSaidaEmLoteModalProps) {
-  const { registrarSaida } = useMarina();
+  const { registrarSaida } = useNuvra();
   const navigate = useNavigate();
   const [saidaRegistrada, setSaidaRegistrada] = useState<Set<string>>(new Set());
   const [observacoes, setObservacoes] = useState<Record<string, string>>({});
@@ -148,7 +148,7 @@ export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }:
 
           <div className="text-base text-muted-foreground">
             <p className="font-medium">
-              {pessoasFiltradas.length} de {pessoasDentro.length} pessoa{pessoasDentro.length > 1 ? 's' : ''} dentro da marina
+              {pessoasFiltradas.length} de {pessoasDentro.length} pessoa{pessoasDentro.length > 1 ? 's' : ''} dentro do local
               {searchTerm && ` (filtrado${pessoasFiltradas.length !== 1 ? 's' : ''})`}
             </p>
             {saidaRegistrada.size > 0 && (
@@ -351,7 +351,7 @@ export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }:
                   </span>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-muted-foreground">Tempo na marina</p>
+                  <p className="text-xs text-muted-foreground">Tempo no local</p>
                   <p className="font-semibold text-primary">{getTempoDecorrido(confirmandoSaida.entradaEm)}</p>
                 </div>
               </div>
@@ -430,7 +430,7 @@ export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }:
               Saída em Lote
             </DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja registrar saída para todas as {pessoasDentro.length} pessoa{pessoasDentro.length > 1 ? 's' : ''} dentro da marina?
+              Tem certeza que deseja registrar saída para todas as {pessoasDentro.length} pessoa{pessoasDentro.length > 1 ? 's' : ''} dentro do local?
             </DialogDescription>
           </DialogHeader>
 
@@ -438,7 +438,7 @@ export function RegistrarSaidaEmLoteModal({ open, onOpenChange, pessoasDentro }:
             <div className="p-4 rounded-lg bg-muted">
               <p className="text-sm text-muted-foreground mb-2">Esta ação:</p>
               <ul className="text-sm space-y-1">
-                <li>• Registrar saída para todas as pessoas dentro da marina</li>
+                <li>• Registrar saída para todas as pessoas dentro do local</li>
                 <li>• Usará o horário atual como horário de saída</li>
                 <li>• Não será possível desfazer</li>
               </ul>

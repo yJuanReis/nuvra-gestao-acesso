@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -18,7 +18,7 @@ interface ExcluirPessoaModalProps {
 }
 
 export function ExcluirPessoaModal({ open, onOpenChange, pessoa }: ExcluirPessoaModalProps) {
-  const { excluirPessoa } = useMarina();
+  const { excluirPessoa } = useNuvra();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleExcluir = async () => {

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { 
   LogIn, Search, FileText, Phone, Car, AlertCircle, 
   UserPlus, Edit2, X, Users, Gift, Ship, Briefcase, 
@@ -37,7 +37,7 @@ export function RegistrarEntradaModal({
   onPessoaPreSelecionadaUsada,
   onAbrirCadastro
 }: RegistrarEntradaModalProps) {
-  const { pessoas, registrarEntrada, podeEntrar, atualizarPessoa } = useMarina();
+  const { pessoas, registrarEntrada, podeEntrar, atualizarPessoa, tiposPessoa } = useNuvra();
   
   // Estados
   const [searchTerm, setSearchTerm] = useState('');
@@ -240,7 +240,7 @@ onClick={() => handleSelectPessoa(pessoa.id)}
                           <div className="flex items-center gap-2">
                             {!check.pode && (
                               <span className="flex items-center gap-1 text-[11px] uppercase font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
-                                Na Marina
+                                No Local
                               </span>
                             )}
                           </div>
@@ -341,12 +341,9 @@ onClick={() => handleSelectPessoa(pessoa.id)}
                                 className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <option value="">Selecione...</option>
-                                <option value="cliente">Cliente</option>
-                                <option value="colaborador">Colaborador</option>
-                                <option value="marinheiro">Marinheiro</option>
-                                <option value="prestador">Prestador de Serviço</option>
-                                <option value="proprietario">Proprietário</option>
-                                <option value="visita">Visita</option>
+                                {tiposPessoa.map((tipo) => (
+                                  <option key={tipo.id} value={tipo.nome}>{tipo.nome}</option>
+                                ))}
                               </select>
                             ) : (
                               <div className={cn(

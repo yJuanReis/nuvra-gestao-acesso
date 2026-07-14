@@ -1,6 +1,6 @@
-# Sistema de Controle de Acesso 🏢
+# Nuvra - Gestão de Acesso 🏢
 
-Um sistema profissional web para controle de entrada e saída de pessoas e veículos em empresas e estabelecimentos.
+Um sistema profissional web para controle de entrada e saída de pessoas em estabelecimentos.
 
 ## 🚀 Quick Start
 
@@ -88,7 +88,7 @@ Toda a documentação está em [`./docs`](./docs/):
 ├── docs/                    # 📚 Documentação completa
 ├── src/
 │   ├── components/          # React components
-│   ├── contexts/            # Estado global (MarinaContext)
+│   ├── contexts/            # Estado global (NuvraContext)
 │   ├── types/              # TypeScript types
 │   ├── data/               # Mock data
 │   └── pages/              # Rotas
@@ -161,8 +161,8 @@ npm run dev
 - Histórico de acessos
 
 ### Registro de Acesso
-- Entrada de pessoas/veículos
-- Saída de pessoas/veículos
+- Entrada de pessoas
+- Saída de pessoas
 - Validação em tempo real
 
 ### Histórico de Acessos
@@ -183,7 +183,7 @@ npm run dev
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_APP_NAME="Sistema de Controle de Acesso"
+VITE_APP_NAME="Nuvra - Gestão de Acesso"
 VITE_APP_VERSION="1.0.0"
 ```
 
@@ -227,6 +227,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 **Versão**: 1.0.0  
 **Status**: ✅ Production Ready  
-**Última atualização**: Janeiro 2026
+**Última atualização**: Julho 2026
 
 Boa sorte! 🏢🔒

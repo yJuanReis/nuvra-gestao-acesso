@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { Lock, User } from 'lucide-react';
 
 interface AlterarSenhaModalProps {
@@ -14,7 +14,7 @@ interface AlterarSenhaModalProps {
 }
 
 export function AlterarSenhaModal({ open, onOpenChange, usuarioId, nomeUsuario }: AlterarSenhaModalProps) {
-  const { alterarSenhaUsuario } = useMarina();
+  const { alterarSenhaUsuario } = useNuvra();
   const [formData, setFormData] = useState({
     novaSenha: '',
     confirmarSenha: '',

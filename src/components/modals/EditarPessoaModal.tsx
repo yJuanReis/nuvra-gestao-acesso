@@ -3,13 +3,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useMarina } from '@/contexts/MarinaContext';
-import { Pessoa } from '@/types/marina';
+import { useNuvra } from '@/contexts/NuvraContext';
+import { Pessoa } from '@/types/nuvra';
 import { FileText, Phone, Car, Users, Gift, Ship, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateCPF, validateRG, validatePlaca } from '@/lib/validation';
-
-type TipoPessoa = 'cliente' | 'visita' | 'marinheiro' | 'proprietario' | 'colaborador' | 'prestador' | '';
 
 interface EditarPessoaModalProps {
   open: boolean;
@@ -18,11 +16,11 @@ interface EditarPessoaModalProps {
 }
 
 export function EditarPessoaModal({ open, onOpenChange, pessoa }: EditarPessoaModalProps) {
-  const { atualizarPessoa } = useMarina();
+  const { atualizarPessoa, tiposPessoa } = useNuvra();
   const [formData, setFormData] = useState({
     nome: '',
     documento: '',
-    tipo: '' as TipoPessoa,
+    tipo: '',
     contato: '',
     placa: '',
   });
@@ -34,7 +32,7 @@ export function EditarPessoaModal({ open, onOpenChange, pessoa }: EditarPessoaMo
       setFormData({
         nome: pessoa.nome,
         documento: pessoa.documento,
-        tipo: (pessoa.tipo || '') as TipoPessoa,
+        tipo: pessoa.tipo || '',
         contato: pessoa.contato || '',
         placa: pessoa.placa || '',
       });
@@ -68,7 +66,7 @@ export function EditarPessoaModal({ open, onOpenChange, pessoa }: EditarPessoaMo
     atualizarPessoa(pessoa.id, {
       nome: formData.nome,
       documento: formData.documento,
-      tipo: (formData.tipo as TipoPessoa) || undefined,
+      tipo: formData.tipo || undefined,
       contato: formData.contato || undefined,
       placa: formData.placa || undefined,
     });
@@ -158,12 +156,9 @@ export function EditarPessoaModal({ open, onOpenChange, pessoa }: EditarPessoaMo
               className="h-11 px-3 rounded-md border border-input bg-background text-sm"
             >
               <option value="">Selecione um tipo</option>
-              <option value="cliente">Cliente</option>
-              <option value="colaborador">Colaborador</option>
-              <option value="marinheiro">Marinheiro</option>
-              <option value="prestador">Prestador de Serviço</option>
-              <option value="proprietario">Proprietário</option>
-              <option value="visita">Visita</option>
+              {tiposPessoa.map((tipo) => (
+                <option key={tipo.id} value={tipo.nome}>{tipo.nome}</option>
+              ))}
             </select>
           </div>
 

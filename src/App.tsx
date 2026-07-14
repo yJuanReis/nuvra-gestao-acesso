@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { MarinaProvider, useMarina } from "@/contexts/MarinaContext";
+import { NuvraProvider, useNuvra } from "@/contexts/NuvraContext";
 import { useSupabaseInit } from "@/hooks/useSupabaseInit";
 import LoginPage from "./components/LoginPage";
 import Index from "./pages/Index";
@@ -23,7 +23,7 @@ const App = () => {
   // Protected Route para usuários autenticados
   function ProtectedRoute({ children }: { children: React.ReactNode }) {
     try {
-      const { isAuthenticated } = useMarina();
+      const { isAuthenticated } = useNuvra();
       if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
       }
@@ -36,7 +36,7 @@ const App = () => {
   // Protected Route para admin e dono
   function AdminRoute({ children }: { children: React.ReactNode }) {
     try {
-      const { isAuthenticated, user } = useMarina();
+      const { isAuthenticated, user } = useNuvra();
       if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
       }
@@ -52,7 +52,7 @@ const App = () => {
   // Layout das rotas
   function AppRoutes() {
     try {
-      const { authLoading, isAuthenticated, user } = useMarina();
+      const { authLoading, isAuthenticated, user } = useNuvra();
 
 
       // Mostra loading screen apenas durante inicialização
@@ -123,7 +123,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <MarinaProvider>
+        <NuvraProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter
@@ -134,7 +134,7 @@ const App = () => {
           >
             <AppRoutes />
           </BrowserRouter>
-        </MarinaProvider>
+        </NuvraProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

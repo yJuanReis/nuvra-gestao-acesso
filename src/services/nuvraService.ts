@@ -1,19 +1,19 @@
 import { supabase } from '@/lib/supabase';
-import { Movimentacao, PessoaDentro, Pessoa } from '@/types/marina';
+import { Movimentacao, PessoaDentro, Pessoa } from '@/types/nuvra';
 
 /**
- * Serviço de gerenciamento de marina com funções de saída automática
+ * Serviço de gerenciamento do Nuvra com funções de saída automática
  */
-export class MarinaService {
-  private static instance: MarinaService;
+export class NuvraService {
+  private static instance: NuvraService;
 
   private constructor() {}
 
-  public static getInstance(): MarinaService {
-    if (!MarinaService.instance) {
-      MarinaService.instance = new MarinaService();
+  public static getInstance(): NuvraService {
+    if (!NuvraService.instance) {
+      NuvraService.instance = new NuvraService();
     }
-    return MarinaService.instance;
+    return NuvraService.instance;
   }
 
   /**
@@ -25,10 +25,9 @@ export class MarinaService {
    */
   public async executarSaidaAutomatica(empresaId: string, tempoLimiteHoras: number = 13): Promise<number> {
     try {
-      console.log(`[MarinaService] Executando saída automática para empresa ${empresaId} com limite de ${tempoLimiteHoras} horas`);
+      console.log(`[NuvraService] Executando saída automática para empresa ${empresaId} com limite de ${tempoLimiteHoras} horas`);
 
       // Obter TODAS as movimentações ativas da empresa (com índice otimizado)
-      // Nota: Para escalas muito grandes, considere paginar esta query
       const { data: movimentacoesAtivas, error } = await supabase
         .from('movimentacoes')
         .select('id, entrada_em, observacao')
@@ -36,12 +35,12 @@ export class MarinaService {
         .eq('status', 'DENTRO');
 
       if (error) {
-        console.error('[MarinaService] Erro ao buscar movimentações ativas:', error);
+        console.error('[NuvraService] Erro ao buscar movimentações ativas:', error);
         throw error;
       }
 
       const count = movimentacoesAtivas?.length || 0;
-      console.log(`[MarinaService] Movimentações ativas encontradas: ${count}`);
+      console.log(`[NuvraService] Movimentações ativas encontradas: ${count}`);
 
       if (count === 0) {
         return 0;
@@ -56,7 +55,7 @@ export class MarinaService {
         return tempoDecorrido >= tempoLimiteMs;
       });
 
-      console.log(`[MarinaService] Movimentações que ultrapassaram limite: ${movimentacoesParaSair.length}`);
+      console.log(`[NuvraService] Movimentações que ultrapassaram limite: ${movimentacoesParaSair.length}`);
 
       if (movimentacoesParaSair.length === 0) {
         return 0;
@@ -86,16 +85,16 @@ export class MarinaService {
           .upsert(updates, { onConflict: 'id' });
 
         if (bulkError) {
-          console.error('[MarinaService] Erro no bulk update:', bulkError);
+          console.error('[NuvraService] Erro no bulk update:', bulkError);
           throw bulkError;
         }
 
-        console.log(`[MarinaService] Bulk update concluído: ${updates.length} registros`);
+        console.log(`[NuvraService] Bulk update concluído: ${updates.length} registros`);
       }
 
       return movimentacoesParaSair.length;
     } catch (error) {
-      console.error('[MarinaService] Erro ao executar saída automática:', error);
+      console.error('[NuvraService] Erro ao executar saída automática:', error);
       throw error;
     }
   }
@@ -238,7 +237,7 @@ export class MarinaService {
    */
   public async getMovimentacoesPorEmpresa(empresaId: string): Promise<Movimentacao[]> {
     try {
-      console.log(`[MarinaService] Buscando todas as movimentações via RPC para empresa ${empresaId}`);
+      console.log(`[NuvraService] Buscando todas as movimentações via RPC para empresa ${empresaId}`);
 
       const BATCH_SIZE = 1000;
       let offset = 0;
@@ -255,12 +254,12 @@ export class MarinaService {
           });
 
         if (error) {
-          console.error('[MarinaService] Erro ao buscar movimentações via RPC:', JSON.stringify(error, null, 2));
+          console.error('[NuvraService] Erro ao buscar movimentações via RPC:', JSON.stringify(error, null, 2));
           throw error;
         }
 
         const batch = data || [];
-        console.log(`[MarinaService] Batch movimentações offset ${offset}: ${batch.length} registros`);
+        console.log(`[NuvraService] Batch movimentações offset ${offset}: ${batch.length} registros`);
 
         if (batch.length === 0 || batch.length < BATCH_SIZE) {
           todasMovimentacoes = [...todasMovimentacoes, ...batch];
@@ -271,10 +270,10 @@ export class MarinaService {
         }
       }
 
-      console.log(`[MarinaService] Total de movimentações encontradas: ${todasMovimentacoes.length}`);
+      console.log(`[NuvraService] Total de movimentações encontradas: ${todasMovimentacoes.length}`);
       return todasMovimentacoes;
     } catch (error) {
-      console.error('[MarinaService] Erro ao buscar movimentações por empresa:', error);
+      console.error('[NuvraService] Erro ao buscar movimentações por empresa:', error);
       throw error;
     }
   }
@@ -296,8 +295,8 @@ export class MarinaService {
     incluirExcluidas: boolean = false
   ): Promise<Movimentacao[]> {
     try {
-      console.log(`[MarinaService] Buscando movimentações via RPC para empresa ${empresaId}`);
-      console.log(`[MarinaService] Período: ${dataInicio} até ${dataFim}`);
+      console.log(`[NuvraService] Buscando movimentações via RPC para empresa ${empresaId}`);
+      console.log(`[NuvraService] Período: ${dataInicio} até ${dataFim}`);
 
       const BATCH_SIZE = 1000;
       let offset = 0;
@@ -317,28 +316,26 @@ export class MarinaService {
           });
 
         if (error) {
-          console.error('[MarinaService] Erro ao buscar movimentações via RPC:', JSON.stringify(error, null, 2));
+          console.error('[NuvraService] Erro ao buscar movimentações via RPC:', JSON.stringify(error, null, 2));
           throw error;
         }
 
         const batch = data || [];
-        console.log(`[MarinaService] Batch offset ${offset}: ${batch.length} registros`);
+        console.log(`[NuvraService] Batch offset ${offset}: ${batch.length} registros`);
 
         if (batch.length === 0 || batch.length < BATCH_SIZE) {
-          // último batch ou结果 vazio
           todasMovimentacoes = [...todasMovimentacoes, ...batch];
           temMaisRegistros = false;
         } else {
-          // Há mais registros para buscar
           todasMovimentacoes = [...todasMovimentacoes, ...batch];
           offset += BATCH_SIZE;
         }
       }
 
-      console.log(`[MarinaService] Total de movimentações encontradas: ${todasMovimentacoes.length}`);
+      console.log(`[NuvraService] Total de movimentações encontradas: ${todasMovimentacoes.length}`);
       return todasMovimentacoes;
     } catch (error) {
-      console.error('[MarinaService] Erro ao buscar movimentações por período:', error);
+      console.error('[NuvraService] Erro ao buscar movimentações por período:', error);
       throw error;
     }
   }
@@ -351,7 +348,7 @@ export class MarinaService {
    */
   public async getPessoasPorEmpresa(empresaId: string): Promise<Pessoa[]> {
     try {
-      console.log(`[MarinaService] Buscando todas as pessoas via RPC para empresa ${empresaId}`);
+      console.log(`[NuvraService] Buscando todas as pessoas via RPC para empresa ${empresaId}`);
 
       const BATCH_SIZE = 1000;
       let offset = 0;
@@ -368,12 +365,12 @@ export class MarinaService {
           });
 
         if (error) {
-          console.error('[MarinaService] Erro ao buscar pessoas via RPC:', JSON.stringify(error, null, 2));
+          console.error('[NuvraService] Erro ao buscar pessoas via RPC:', JSON.stringify(error, null, 2));
           throw error;
         }
 
         const batch = data || [];
-        console.log(`[MarinaService] Batch pessoas offset ${offset}: ${batch.length} registros`);
+        console.log(`[NuvraService] Batch pessoas offset ${offset}: ${batch.length} registros`);
 
         if (batch.length === 0 || batch.length < BATCH_SIZE) {
           todasPessoas = [...todasPessoas, ...batch];
@@ -384,14 +381,14 @@ export class MarinaService {
         }
       }
 
-      console.log(`[MarinaService] Total de pessoas encontradas: ${todasPessoas.length}`);
+      console.log(`[NuvraService] Total de pessoas encontradas: ${todasPessoas.length}`);
       return todasPessoas;
     } catch (error) {
-      console.error('[MarinaService] Erro ao buscar pessoas por empresa:', error);
+      console.error('[NuvraService] Erro ao buscar pessoas por empresa:', error);
       throw error;
     }
   }
 }
 
 // Exportar instância única
-export const marinaService = MarinaService.getInstance();
+export const nuvraService = NuvraService.getInstance();

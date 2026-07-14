@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useMarina } from '@/contexts/MarinaContext';
-import { MovimentacaoComPessoa, PessoaDentro } from '@/types/marina';
+import { useNuvra } from '@/contexts/NuvraContext';
+import { MovimentacaoComPessoa, PessoaDentro } from '@/types/nuvra';
 import { FileText, LogIn, LogOut, Users, Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -26,7 +26,7 @@ interface EditarMovimentacaoModalProps {
 }
 
 export function EditarMovimentacaoModal({ open, onOpenChange, movimentacao }: EditarMovimentacaoModalProps) {
-  const { atualizarMovimentacao, excluirMovimentacao, atualizarPessoa } = useMarina();
+  const { atualizarMovimentacao, excluirMovimentacao, atualizarPessoa } = useNuvra();
   const [formData, setFormData] = useState({
     entrada_em: '',
     saida_em: '',

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label';
 import { EditarPessoaModal } from '@/components/modals/EditarPessoaModal';
 import { EditarMovimentacaoModal } from '@/components/modals/EditarMovimentacaoModal';
 import { RegistrarSaidaPersonalizadaModal } from '@/components/modals/RegistrarSaidaPersonalizadaModal';
-import { MovimentacaoComPessoa } from '@/types/marina';
+import { MovimentacaoComPessoa } from '@/types/nuvra';
 import { UserTypeIcon, UserTypeAvatar } from '@/lib/userTypeIcons';
-import { Pessoa, PessoaDentro } from '@/types/marina';
+import { Pessoa, PessoaDentro } from '@/types/nuvra';
 import {
   Pagination,
   PaginationContent,
@@ -51,7 +51,7 @@ import { cn } from '@/lib/utils';
 import { formatters } from '@/lib/validation';
 
 export function HistoricoPage() {
-  const { getHistoricoMovimentacoes } = useMarina();
+  const { getHistoricoMovimentacoes, tiposPessoa } = useNuvra();
   
   // Estado de filtros específicos (mantém a lógica existente)
   const [filtros, setFiltros] = useState({
@@ -111,7 +111,7 @@ export function HistoricoPage() {
   }, []);
 
   // Pipeline de filtragem otimizado
-  // 1. Dados brutos do useMarina()
+  // 1. Dados brutos do useNuvra()
   const dadosBrutos = useMemo(() => {
     return getHistoricoMovimentacoes({
       dataInicio: filtros.dataInicio || undefined,
@@ -371,12 +371,9 @@ export function HistoricoPage() {
                   <SelectValue placeholder="Selecione o tipo..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="colaborador">Colaborador</SelectItem>
-                  <SelectItem value="cliente">Cliente</SelectItem>
-                  <SelectItem value="marinheiro">Marinheiro</SelectItem>
-                  <SelectItem value="prestador">Prestador de Serviço</SelectItem>
-                  <SelectItem value="proprietario">Proprietário</SelectItem>
-                  <SelectItem value="visita">Visita</SelectItem>
+                  {tiposPessoa.map((tipo) => (
+                    <SelectItem key={tipo.id} value={tipo.nome}>{tipo.nome}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

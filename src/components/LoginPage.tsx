@@ -1,78 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Ship, Mail, Lock, ChevronRight, AlertCircle, Info, Loader2 } from 'lucide-react';
-
-// Componente de Vídeo de Fundo com Lazy Loading
-const BackgroundVideo = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [entry] = entries;
-    if (entry.isIntersecting && videoRef.current) {
-      // Iniciar carregamento do vídeo quando estiver visível
-      videoRef.current.load();
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleIntersection, {
-      threshold: 0.1,
-      rootMargin: '50px'
-    });
-
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [handleIntersection]);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Fallback Image for slow connections or errors */}
-      {!isLoaded || hasError ? (
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 animate-pulse"
-          style={{
-            backgroundImage: 'url("/placeholder.svg")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-      ) : null}
-
-      {/* Video Element */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ minHeight: '100vh' }}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        onLoadedData={() => setIsLoaded(true)}
-        onError={() => setHasError(true)}
-      >
-        <source src="/BR_MARINAS.m4v" type="video/mp4" />
-        Seu navegador não suporta o elemento de vídeo.
-      </video>
-
-      {/* Overlay escuro para melhorar legibilidade */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-    </div>
-  );
-};
+import { Ship, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -81,15 +13,12 @@ export default function LoginPage() {
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const hasRedirectedRef = useRef(false);
 
-  // Redirecionar automaticamente quando o usuário fica autenticado
-  // Apenas redirecionar quando o perfil estiver carregado (evita loops causados por user temporário)
   useEffect(() => {
-
     if (user && user.profile && !hasRedirectedRef.current && !loading) {
       hasRedirectedRef.current = true;
-      // Redirecionar imediatamente sem delay para evitar loops
       navigate('/', { replace: true });
     }
   }, [user, loading, navigate]);
@@ -113,7 +42,7 @@ export default function LoginPage() {
       const result = await signIn(email.trim(), senha);
 
       if (result.success) {
-        // O redirecionamento será feito pelo useEffect quando o user for atualizado
+        // Redirect will happen via useEffect
       } else {
         setError(result.error || 'Erro de autenticação');
       }
@@ -124,69 +53,132 @@ export default function LoginPage() {
     }
   };
 
-  const fillCredentials = (e: string, s: string) => {
-    setEmail(e);
-    setSenha(s);
-  };
-
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
-      {/* Background Video Component */}
-      <BackgroundVideo />
-      
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo section */}
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="flex h-24 w-24 items-center justify-center rounded-2xl marina-header mx-auto mb-6 shadow-elevated-lg border-4 border-white/20">
-            <Ship className="h-12 w-12 text-white drop-shadow-xl" />
-          </div>
-          <h1 className="text-5xl font-display font-extrabold text-white mb-3 drop-shadow-2xl tracking-wide">
-              BR Marinas
-          </h1>
-          <p className="text-lg text-white/95 drop-shadow-lg font-medium">
-            Controle de Acesso
-          </p>
+    <div className="min-h-screen flex">
+      {/* Left Panel - Decorative */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
         </div>
-
-        {/* Login card */}
-        <div className="card-elevated-md w-full p-6 animate-fade-in" style={{ animationDelay: '100ms' }}>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-3">
-              <Label htmlFor="email" className="flex items-center gap-3 text-black font-semibold text-lg">
-                <Mail className="h-5 w-5 text-black" />
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="email.exemplo@marina.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-14 text-lg bg-white/95 backdrop-blur-md border-2 border-white/30 focus:border-white/80 focus:ring-4 focus:ring-white/20"
-                disabled={isLoading}
-              />
+        
+        {/* Wave decoration */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-teal-500/20 to-transparent" />
+        
+        <div className="relative z-10 flex flex-col justify-center items-center w-full p-12">
+          <div className="text-center space-y-6">
+            {/* Logo */}
+            <div className="flex justify-center">
+              <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <svg className="w-12 h-12 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
             </div>
+            
+            <div>
+              <h1 className="text-5xl font-bold text-white tracking-tight">
+                Nuvra
+              </h1>
+              <p className="text-xl text-slate-300 mt-2 font-medium">
+                Gestão de Acesso
+              </p>
+            </div>
+            
+            <p className="text-slate-400 max-w-md mx-auto leading-relaxed">
+              Sistema profissional de controle de entrada e saída para estabelecimentos.
+              Gerencie o acesso de forma simples e eficiente.
+            </p>
+            
+            {/* Features */}
+            <div className="grid grid-cols-2 gap-4 pt-8 max-w-sm mx-auto">
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <div className="text-teal-400 text-2xl font-bold">100%</div>
+                <div className="text-slate-400 text-sm">Online</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                <div className="text-teal-400 text-2xl font-bold">24/7</div>
+                <div className="text-slate-400 text-sm">Disponível</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <div className="space-y-3">
-              <Label htmlFor="senha" className="flex items-center gap-3 text-black font-semibold text-lg">
-                <Lock className="h-5 w-5 text-black" />
-                Senha
-              </Label>
-              <Input
-                id="senha"
-                type="password"
-                placeholder="••••••••"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                className="h-14 text-lg bg-white/95 backdrop-blur-md border-2 border-white/30 focus:border-white/80 focus:ring-4 focus:ring-white/20"
-                disabled={isLoading}
-              />
+      {/* Right Panel - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50">
+        <div className="w-full max-w-md space-y-8">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 shadow-lg">
+              <svg className="w-8 h-8 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h1 className="mt-4 text-3xl font-bold text-slate-900">Nuvra</h1>
+          </div>
+
+          {/* Welcome Text */}
+          <div className="text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-slate-900">
+              Bem-vindo de volta
+            </h2>
+            <p className="mt-2 text-slate-500">
+              Entre com suas credenciais para acessar o sistema
+            </p>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+                  Email
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-12 pl-11 bg-white border-slate-200 focus:border-slate-800 focus:ring-slate-800"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="senha" className="text-sm font-medium text-slate-700">
+                  Senha
+                </Label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Lock className="h-5 w-5" />
+                  </div>
+                  <Input
+                    id="senha"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    className="h-12 pl-11 pr-11 bg-white border-slate-200 focus:border-slate-800 focus:ring-slate-800"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive-light text-destructive text-sm">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {error}
               </div>
@@ -195,32 +187,29 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={isLoading || loading}
-              className="w-full h-14 text-lg font-bold gap-3 bg-white hover:bg-gray-100 text-gray-900 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="w-full h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
                   Entrando...
                 </>
               ) : loading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
                   Carregando...
                 </>
               ) : (
-                <>
-                  Entrar no Sistema
-                  <ChevronRight className="h-5 w-5" />
-                </>
+                'Entrar no Sistema'
               )}
             </Button>
           </form>
-        </div>
 
-        {/* Footer */}
-          <p className="text-sm text-white/90 mt-10 animate-fade-in text-center font-medium tracking-wide" style={{ animationDelay: '300ms' }}>
-          Versão 3.0 • BR Marinas
-        </p>
+          {/* Footer */}
+          <p className="text-center text-sm text-slate-400">
+            Nuvra - Gestão de Acesso
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,37 +1,35 @@
-import { Ship, LogOut, History, LayoutDashboard, Users, Settings, Building2, User, Clock, Activity } from 'lucide-react';
-import { useMarina } from '@/contexts/MarinaContext';
+import { Ship, LogOut, History, LayoutDashboard, Users, Settings, Building2, User, Clock, Menu, X } from 'lucide-react';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 export function Header() {
-  const { empresaAtual, user, logout, getPessoasDentro } = useMarina();
+  const { empresaAtual, user, logout, getPessoasDentro } = useNuvra();
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Função para fazer logout e redirecionar
   const handleLogout = async () => {
     await logout();
     navigate('/login', { replace: true });
   };
 
-  // Calcular estatísticas em tempo real
   const stats = useMemo(() => {
     const pessoasDentro = getPessoasDentro();
     const totalPessoas = pessoasDentro.length;
     const tempoMedio = totalPessoas > 0
       ? Math.round(pessoasDentro.reduce((acc, p) => {
           const tempo = Date.now() - new Date(p.entradaEm).getTime();
-          return acc + (tempo / (1000 * 60 * 60)); // em horas
+          return acc + (tempo / (1000 * 60 * 60));
         }, 0) / totalPessoas * 10) / 10
       : 0;
 
     return { totalPessoas, tempoMedio };
   }, [getPessoasDentro]);
 
-  // Verificar permissões para exibir Admin
   const podeVerAdmin = user?.role === 'admin' || user?.role === 'owner';
   
   const navItems = [
@@ -41,28 +39,27 @@ export function Header() {
     ...(podeVerAdmin ? [{ href: '/admin', label: 'Admin', icon: Settings }] : []),
   ];
 
-
   return (
-    <header className="corporate-header sticky top-0 z-50 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-lg border-b border-blue-500/30">
-      <div className="container mx-auto px-6">
-        {/* Header Corporativo Unificado */}
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <div className="container mx-auto px-4">
+        {/* Main Header */}
         <div className="flex h-16 items-center justify-between">
-          {/* Logo e Nome da Empresa */}
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 border border-white/20 shadow-sm">
-              <Ship className="h-6 w-6 text-white" />
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 shadow-md">
+              <svg className="h-5 w-5 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <div>
-              <h1 className="text-lg font-semibold text-white tracking-wide">
-                BR Marinas
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-bold text-slate-900 leading-tight">
+                Nuvra
               </h1>
-              <p className="text-xs text-slate-300 font-medium">
-                Sistema de Controle de Acesso - BR Marinas
+              <p className="text-xs text-slate-500">
+                {empresaAtual?.nome || 'Sistema de Acesso'}
               </p>
             </div>
           </div>
 
-          {/* Navegação Principal */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.href;
@@ -71,99 +68,98 @@ export function Header() {
                   key={item.href}
                   to={item.href}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 relative",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-white/10 text-white font-semibold"
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
+                      ? "bg-slate-100 text-slate-900"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   )}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full" />
-                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Informações Laterais */}
-          <div className="flex items-center gap-4">
-
-            {/* Informações da Empresa */}
-            <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-slate-300" />
-              <Badge variant="secondary" className="bg-white/10 text-white border-white/20 font-medium text-sm">
-                {empresaAtual?.nome || 'Marina'}
-              </Badge>
+          {/* Right Section */}
+          <div className="flex items-center gap-3">
+            {/* Stats Badge */}
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-sm font-semibold text-emerald-700">{stats.totalPessoas}</span>
+                <span className="text-xs text-emerald-600">no local</span>
+              </div>
             </div>
 
-            {/* Botão de Logout */}
+            {/* User Menu */}
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg">
+                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+                  <User className="h-4 w-4 text-slate-600" />
+                </div>
+                <span className="text-sm font-medium text-slate-700">{user?.nome?.split(' ')[0]}</span>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                title="Sair"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleLogout}
-              className="text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 border border-white/10"
-              title="Sair do sistema"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Sair</span>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-white/10 bg-white/5">
-          <div className="flex items-center justify-between py-3 px-3">
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 py-4 animate-in slide-in-from-top-2">
+            <div className="flex flex-col gap-1">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-slate-100 text-slate-900"
+                        : "text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+            
             {/* Mobile Stats */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                <span className="text-sm font-medium text-white">{stats.totalPessoas}</span>
-              </div>
-              {stats.tempoMedio > 0 && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-300" />
-                  <span className="text-sm font-medium text-white">{stats.tempoMedio}h médio</span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                <User className="h-4 w-4 text-white" />
-              </div>
-              <div className="text-right">
-                <span className="text-sm font-medium text-white">{user?.nome?.split(' ')[0]}</span>
-                <p className="text-xs text-blue-200">{empresaAtual?.nome || 'Marina'}</p>
+            <div className="mt-4 px-4">
+              <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-sm font-semibold text-emerald-700">
+                  {stats.totalPessoas} pessoa{stats.totalPessoas !== 1 ? 's' : ''} no local
+                </span>
               </div>
             </div>
           </div>
-
-          {/* Mobile Navigation */}
-          <div className="grid grid-cols-4 gap-1 py-2 px-2">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-md text-xs font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-white/10 text-white font-semibold"
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span className="text-center leading-tight">{item.label}</span>
-                  {isActive && (
-                    <div className="absolute inset-x-1 bottom-1 h-0.5 bg-white rounded-full" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
+        )}
       </div>
     </header>
   );

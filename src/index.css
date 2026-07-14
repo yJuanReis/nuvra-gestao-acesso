@@ -1,141 +1,138 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Marina Access Control - Design System
-   Nautical-inspired professional theme with deep ocean blues and crisp whites
-   All colors in HSL format
+/* Nuvra - Gestão de Acesso
+   Sistema profissional de controle de entrada e saída para estabelecimentos
 */
 
 @layer base {
   :root {
-    /* Core Backgrounds */
-    --background: 210 40% 98%;
-    --foreground: 215 35% 15%;
+    /* Core Backgrounds - Clean & Modern */
+    --background: 220 20% 98%;
+    --foreground: 220 25% 10%;
 
-    /* Card surfaces */
+    /* Card surfaces - Pure white */
     --card: 0 0% 100%;
-    --card-foreground: 215 35% 15%;
+    --card-foreground: 220 25% 10%;
 
     /* Popover surfaces */
     --popover: 0 0% 100%;
-    --popover-foreground: 215 35% 15%;
+    --popover-foreground: 220 25% 10%;
 
-    /* Primary - Deep Ocean Blue */
-    --primary: 210 85% 35%;
+    /* Primary - Deep Navy Blue */
+    --primary: 220 50% 35%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 210 75% 95%;
-    --primary-hover: 210 85% 28%;
+    --primary-light: 220 40% 95%;
+    --primary-hover: 220 55% 28%;
 
-    /* Secondary - Soft Harbor */
-    --secondary: 210 30% 95%;
-    --secondary-foreground: 215 35% 25%;
+    /* Secondary - Soft gray */
+    --secondary: 220 15% 96%;
+    --secondary-foreground: 220 20% 20%;
 
     /* Muted elements */
-    --muted: 210 25% 93%;
-    --muted-foreground: 215 20% 50%;
+    --muted: 220 10% 96%;
+    --muted-foreground: 220 8% 45%;
 
-    /* Accent - Teal Marina */
-    --accent: 175 70% 40%;
+    /* Accent - Vibrant Teal */
+    --accent: 175 80% 40%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 175 60% 95%;
+    --accent-light: 175 60% 96%;
 
-    /* Status Colors */
-    --success: 160 70% 38%;
+    /* Status Colors - More vivid */
+    --success: 158 70% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 160 60% 94%;
+    --success-light: 158 50% 96%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 90% 55%;
     --warning-foreground: 0 0% 100%;
-    --warning-light: 38 85% 95%;
+    --warning-light: 38 70% 96%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-light: 0 65% 96%;
+    --destructive-light: 0 60% 97%;
 
     /* Borders and inputs */
-    --border: 210 25% 88%;
-    --input: 210 25% 90%;
-    --ring: 210 85% 35%;
+    --border: 220 10% 90%;
+    --input: 220 10% 94%;
+    --ring: 220 50% 35%;
 
     /* Radius */
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    /* Sidebar - darker nautical */
-    --sidebar-background: 215 45% 12%;
-    --sidebar-foreground: 210 30% 90%;
-    --sidebar-primary: 175 70% 50%;
+    /* Sidebar - Deep elegant navy */
+    --sidebar-background: 220 40% 8%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 175 80% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 40% 18%;
-    --sidebar-accent-foreground: 210 30% 90%;
-    --sidebar-border: 215 35% 20%;
-    --sidebar-ring: 175 70% 50%;
+    --sidebar-accent: 220 30% 15%;
+    --sidebar-accent-foreground: 220 10% 92%;
+    --sidebar-border: 220 30% 18%;
+    --sidebar-ring: 175 80% 45%;
 
     /* Status badge specific */
-    --status-inside: 160 70% 38%;
-    --status-inside-bg: 160 60% 94%;
-    --status-outside: 215 20% 50%;
-    --status-outside-bg: 210 25% 93%;
+    --status-inside: 158 70% 45%;
+    --status-inside-bg: 158 50% 96%;
+    --status-outside: 220 8% 45%;
+    --status-outside-bg: 220 10% 96%;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(215 35% 15% / 0.05);
-    --shadow: 0 4px 6px -1px hsl(215 35% 15% / 0.08), 0 2px 4px -2px hsl(215 35% 15% / 0.05);
-    --shadow-md: 0 10px 15px -3px hsl(215 35% 15% / 0.1), 0 4px 6px -4px hsl(215 35% 15% / 0.05);
-    --shadow-lg: 0 20px 25px -5px hsl(215 35% 15% / 0.1), 0 8px 10px -6px hsl(215 35% 15% / 0.05);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+    --shadow-md: 0 4px 6px -2px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.04);
   }
 
   .dark {
-    --background: 215 45% 8%;
-    --foreground: 210 30% 95%;
+    /* Dark mode */
+    --background: 220 30% 5%;
+    --foreground: 220 15% 95%;
 
-    --card: 215 40% 12%;
-    --card-foreground: 210 30% 95%;
+    --card: 220 25% 9%;
+    --card-foreground: 220 15% 95%;
 
-    --popover: 215 40% 12%;
-    --popover-foreground: 210 30% 95%;
+    --popover: 220 25% 9%;
+    --popover-foreground: 220 15% 95%;
 
-    --primary: 210 80% 55%;
-    --primary-foreground: 215 45% 8%;
-    --primary-light: 210 75% 20%;
-    --primary-hover: 210 80% 60%;
+    /* Primary - Luminous navy */
+    --primary: 220 55% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 220 45% 15%;
+    --primary-hover: 220 60% 62%;
 
-    --secondary: 215 35% 18%;
-    --secondary-foreground: 210 30% 90%;
+    --secondary: 220 20% 13%;
+    --secondary-foreground: 220 15% 92%;
 
-    --muted: 215 35% 18%;
-    --muted-foreground: 210 25% 60%;
+    --muted: 220 20% 13%;
+    --muted-foreground: 220 8% 55%;
 
-    --accent: 175 65% 45%;
+    --accent: 175 75% 45%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 175 50% 20%;
+    --accent-light: 175 50% 15%;
 
-    --success: 160 65% 45%;
+    --success: 158 65% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 160 50% 18%;
+    --success-light: 158 45% 15%;
 
     --warning: 38 85% 55%;
     --warning-foreground: 0 0% 100%;
-    --warning-light: 38 60% 18%;
+    --warning-light: 38 55% 15%;
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-light: 0 50% 18%;
+    --destructive-light: 0 45% 15%;
 
-    --border: 215 30% 22%;
-    --input: 215 30% 22%;
-    --ring: 210 80% 55%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 220 55% 55%;
 
-    --status-inside: 160 65% 45%;
-    --status-inside-bg: 160 50% 18%;
-    --status-outside: 210 25% 60%;
-    --status-outside-bg: 215 35% 18%;
-
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
-    --shadow: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
-    --shadow-md: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
-    --shadow-lg: 0 20px 25px -5px hsl(0 0% 0% / 0.4), 0 8px 10px -6px hsl(0 0% 0% / 0.2);
+    --status-inside: 158 65% 45%;
+    --status-inside-bg: 158 45% 15%;
+    --status-outside: 220 8% 55%;
+    --status-outside-bg: 220 20% 13%;
   }
 }
 
@@ -146,11 +143,11 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;
     @apply font-semibold tracking-tight;
   }
 }
@@ -158,44 +155,80 @@
 @layer components {
   /* Status badges */
   .status-inside {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
     background-color: hsl(var(--status-inside-bg));
     color: hsl(var(--status-inside));
   }
 
   .status-outside {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
     background-color: hsl(var(--status-outside-bg));
     color: hsl(var(--status-outside));
   }
 
   /* Card with shadow */
   .card-elevated {
-    @apply bg-card rounded-lg border border-border;
+    @apply bg-card rounded-xl border border-border;
     box-shadow: var(--shadow);
   }
 
   .card-elevated-md {
-    @apply bg-card rounded-lg border border-border;
+    @apply bg-card rounded-xl border border-border;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-elevated-lg {
+    @apply bg-card rounded-xl border border-border;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Glass effect for premium cards */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md border border-border/50;
     box-shadow: var(--shadow-md);
   }
 
   /* Marina header gradient */
   .marina-header {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(210 75% 45%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(175 80% 40%) 100%);
+    position: relative;
   }
 
-  /* Subtle grid pattern for backgrounds */
-  .bg-grid-pattern {
-    background-image: 
-      linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px);
-    background-size: 24px 24px;
+  .marina-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 40%, hsl(0 0% 100% / 0.05) 50%, transparent 60%);
+    pointer-events: none;
   }
 
-  /* Smooth transitions */
-  .transition-smooth {
-    @apply transition-all duration-200 ease-in-out;
+  /* Focus ring enhancement */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
   }
 }
 
@@ -204,5 +237,26 @@
   .text-gradient-primary {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+
+  /* Subtle animations */
+  .animate-in {
+    animation: animate-in 0.3s ease-out;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-200 ease-out;
   }
 }

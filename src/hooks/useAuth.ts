@@ -140,7 +140,14 @@ export function useAuth(): UseAuthReturn {
       } : undefined
     };
 
-    setUser(basicAuthUser);
+    // Preservar perfil já carregado para o mesmo usuário, evitando
+    // flicker da tela de login em eventos de auth (token refresh, foco de aba).
+    setUser(prev => {
+      if (prev?.id === basicAuthUser.id && prev.profile) {
+        return prev;
+      }
+      return basicAuthUser;
+    });
     setSession({ user: basicAuthUser });
 
     // Depois tentar carregar o perfil em background (não bloqueante)

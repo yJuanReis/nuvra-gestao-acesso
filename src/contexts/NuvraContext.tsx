@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, ReactNode } from 'react';
-import { Empresa, Pessoa, Movimentacao, PessoaDentro, NovaPessoaForm, MovimentacaoComPessoa, AppUser } from '@/types/marina';
+import { Empresa, Pessoa, Movimentacao, PessoaDentro, NovaPessoaForm, MovimentacaoComPessoa, AppUser, TipoPessoaConfig } from '@/types/nuvra';
 import { supabase } from '@/lib/supabase';
 import { useAuth, UserProfile } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { validators } from '@/lib/validation';
-import { marinaService } from '@/services/marinaService';
+import { nuvraService } from '@/services/nuvraService';
 import { format } from 'date-fns';
 
-interface MarinaContextType {
+interface NuvraContextType {
   // Auth state (from useAuth)
   user: UserProfile | null;
   isAuthenticated: boolean;
@@ -44,8 +44,15 @@ interface MarinaContextType {
   // Empresa actions
   deletarEmpresa: (empresaId: string) => Promise<void>;
 
+  // Tipo de Pessoa actions
+  tiposPessoa: TipoPessoaConfig[];
+  adicionarTipoPessoa: (data: { nome: string; icone: string; cor_texto: string; cor_fundo: string }) => Promise<void>;
+  removerTipoPessoa: (tipoId: string) => Promise<void>;
+  atualizarTipoPessoa: (tipoId: string, data: Partial<{ nome: string; icone: string; cor_texto: string; cor_fundo: string }>) => Promise<void>;
+
   // Queries
   getPessoasDentro: () => PessoaDentro[];
+  getMovimentacoesDoDia: () => MovimentacaoComPessoa[];
   getHistoricoMovimentacoes: (filtros?: HistoricoFiltros) => MovimentacaoComPessoa[];
   podeEntrar: (pessoaId: string) => { pode: boolean; motivo?: string };
   getUsuarios: () => Promise<AppUser[]>;
@@ -61,9 +68,9 @@ interface HistoricoFiltros {
   placa?: string;
 }
 
-const MarinaContext = createContext<MarinaContextType | undefined>(undefined);
+const NuvraContext = createContext<NuvraContextType | undefined>(undefined);
 
-export function MarinaProvider({ children }: { children: ReactNode }) {
+export function NuvraProvider({ children }: { children: ReactNode }) {
   // Auth state from useAuth hook
   const { user: authUser, loading: authLoading, signIn, signOut, signUp } = useAuth();
 
@@ -71,6 +78,7 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
+  const [tiposPessoa, setTiposPessoa] = useState<TipoPessoaConfig[]>([]);
   const [businessLoading, setBusinessLoading] = useState(false);
 
   // Computed values
@@ -78,128 +86,172 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
   const empresaAtual = authUser?.profile ? empresas.find(e => e.id === authUser.profile.empresa_id) || null : null;
 
 
-  // Load business data when user changes
-  // OPTIMIZED: Load only active records first, full data on demand
   useEffect(() => {
     if (!authUser?.profile) {
       setPessoas([]);
       setMovimentacoes([]);
       return;
     }
-
-    const loadBusinessData = async () => {
-      setBusinessLoading(true);
-      try {
-        const empresaId = authUser.profile.empresa_id;
-
-        // STEP 1: Load only active movimentacoes (people inside) - much faster!
-        const { data: movimentacoesAtivas } = await supabase
-          .from('movimentacoes')
-          .select('*')
-          .eq('empresa_id', empresaId)
-          .eq('status', 'DENTRO')
-          .order('entrada_em', { ascending: false });
-
-        // STEP 2: Load pessoas that are inside the marina (just those needed for display)
-        const pessoasIdsInside = movimentacoesAtivas?.map(m => m.pessoa_id) || [];
-        
-        let pessoasData: Pessoa[] = [];
-        
-        if (pessoasIdsInside.length > 0) {
-          const { data: pessoasInside } = await supabase
-            .from('pessoas')
-            .select('*')
-            .in('id', pessoasIdsInside);
-          pessoasData = pessoasInside || [];
-        }
-
-        // Set initial state with just active data
-        setMovimentacoes(movimentacoesAtivas || []);
-        setPessoas(pessoasData);
-
-        // STEP 3: Background load ALL data for history/reports (not blocking UI)
-        // This can take longer but won't block the user experience
-        setTimeout(async () => {
-          try {
-            const [allPessoas, allMovimentacoes] = await Promise.all([
-              marinaService.getPessoasPorEmpresa(empresaId),
-              marinaService.getMovimentacoesPorEmpresa(empresaId)
-            ]);
-            
-            // Only update if component is still mounted and data changed
-            setPessoas(prev => {
-              if (prev.length < allPessoas.length) {
-                return allPessoas;
-              }
-              return prev;
-            });
-            
-            setMovimentacoes(prev => {
-              if (prev.length < allMovimentacoes.length) {
-                return allMovimentacoes;
-              }
-              return prev;
-            });
-          } catch (bgError) {
-            console.warn('[MarinaContext] Background load failed (non-critical):', bgError);
-          }
-        }, 1000); // Delay to not block initial render
-
-      } catch (error) {
-        console.error('[MarinaContext] Erro ao carregar dados:', error);
-      } finally {
-        setBusinessLoading(false);
-      }
-    };
-
     loadBusinessData();
   }, [authUser?.profile?.empresa_id]);
 
-  // Load empresas (shared data) - hardcoded marinas
+  // Load empresas (shared data) - apenas do banco (Supabase)
   useEffect(() => {
-    const hardcodedEmpresas: Empresa[] = [
-      { id: 'br_marinas', nome: 'BR Marinas', created_at: new Date().toISOString() },
-      { id: 'gloria', nome: 'Glória', created_at: new Date().toISOString() },
-      { id: 'verolme', nome: 'Verolme', created_at: new Date().toISOString() },
-      { id: 'piratas', nome: 'Piratas', created_at: new Date().toISOString() },
-      { id: 'bracuhy_jl', nome: 'Bracuhy JL', created_at: new Date().toISOString() },
-      { id: 'ribeira', nome: 'Ribeira', created_at: new Date().toISOString() },
-      { id: 'itacuruca', nome: 'Itacuruçá', created_at: new Date().toISOString() },
-      { id: 'buzios', nome: 'Búzios', created_at: new Date().toISOString() },
-      { id: 'paraty', nome: 'Paraty', created_at: new Date().toISOString() },
-      { id: 'boavista', nome: 'Boavista', created_at: new Date().toISOString() },
-      { id: 'piccola', nome: 'Piccola', created_at: new Date().toISOString() }
-    ];
-
     const loadEmpresas = async () => {
       try {
-        // Tentar carregar do Supabase primeiro
         const { data, error } = await supabase.from('empresas').select('*');
         if (error) throw error;
-
-        // Se não há empresas no Supabase, usar as hardcoded
-        if (!data || data.length === 0) {
-          setEmpresas(hardcodedEmpresas);
-          return;
-        }
-
-        // Combinar empresas do banco com hardcoded (priorizando banco)
-        const combinedEmpresas = [...data];
-        hardcodedEmpresas.forEach(hardcoded => {
-          if (!combinedEmpresas.find(e => e.id === hardcoded.id)) {
-            combinedEmpresas.push(hardcoded);
-          }
-        });
-
-        setEmpresas(combinedEmpresas);
+        setEmpresas(data || []);
       } catch (error) {
-        // Fallback: usar empresas hardcoded
-        setEmpresas(hardcodedEmpresas);
+        setEmpresas([]);
       }
     };
 
     loadEmpresas();
   }, []);
+
+  // Tipos de Pessoa actions
+  const carregarTiposPessoa = useCallback(async () => {
+    if (!authUser?.profile) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('tipos_pessoa')
+        .select('*')
+        .eq('empresa_id', authUser.profile.empresa_id);
+
+      if (error) throw error;
+      setTiposPessoa(data || []);
+    } catch (err) {
+      console.warn('[NuvraContext] Erro ao carregar tipos de pessoa:', err);
+    }
+  }, [authUser?.profile]);
+
+  const adicionarTipoPessoa = useCallback(async (data: { nome: string; icone: string; cor_texto: string; cor_fundo: string }) => {
+    if (!authUser?.profile) throw new Error('Usuário não autenticado');
+
+    try {
+      const novoId = crypto.randomUUID();
+      const { data: novoTipo, error } = await supabase
+        .from('tipos_pessoa')
+        .insert({
+          id: novoId,
+          empresa_id: authUser.profile.empresa_id,
+          nome: data.nome.trim(),
+          icone: data.icone,
+          cor_texto: data.cor_texto,
+          cor_fundo: data.cor_fundo,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTiposPessoa(prev => [...prev, novoTipo]);
+      toast.success(`Tipo "${novoTipo.nome}" criado com sucesso!`);
+    } catch (err) {
+      toast.error('Erro ao criar tipo de pessoa');
+      throw err;
+    }
+  }, [authUser?.profile]);
+
+  const removerTipoPessoa = useCallback(async (tipoId: string) => {
+    if (!authUser?.profile) throw new Error('Usuário não autenticado');
+
+    try {
+      const { error } = await supabase
+        .from('tipos_pessoa')
+        .delete()
+        .eq('id', tipoId)
+        .eq('empresa_id', authUser.profile.empresa_id);
+
+      if (error) throw error;
+
+      setTiposPessoa(prev => prev.filter(t => t.id !== tipoId));
+      toast.success('Tipo removido com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao remover tipo');
+      throw err;
+    }
+  }, [authUser?.profile]);
+
+  const atualizarTipoPessoa = useCallback(async (tipoId: string, data: Partial<{ nome: string; icone: string; cor_texto: string; cor_fundo: string }>) => {
+    if (!authUser?.profile) throw new Error('Usuário não autenticado');
+
+    try {
+      const updateData: any = {};
+      if (data.nome !== undefined) updateData.nome = data.nome.trim();
+      if (data.icone !== undefined) updateData.icone = data.icone;
+      if (data.cor_texto !== undefined) updateData.cor_texto = data.cor_texto;
+      if (data.cor_fundo !== undefined) updateData.cor_fundo = data.cor_fundo;
+
+      const { data: tipoAtualizado, error } = await supabase
+        .from('tipos_pessoa')
+        .update(updateData)
+        .eq('id', tipoId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTiposPessoa(prev => prev.map(t => t.id === tipoId ? tipoAtualizado : t));
+      toast.success('Tipo atualizado com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao atualizar tipo');
+      throw err;
+    }
+  }, [authUser?.profile]);
+
+  // Carregar tipos de pessoa junto com dados de negócio
+  const loadBusinessData = async () => {
+    setBusinessLoading(true);
+    try {
+      const empresaId = authUser.profile.empresa_id;
+
+      const { data: movimentacoesAtivas } = await supabase
+        .from('movimentacoes')
+        .select('*')
+        .eq('empresa_id', empresaId)
+        .eq('status', 'DENTRO')
+        .order('entrada_em', { ascending: false });
+
+      const pessoasIdsInside = movimentacoesAtivas?.map(m => m.pessoa_id) || [];
+      
+      let pessoasData: Pessoa[] = [];
+      if (pessoasIdsInside.length > 0) {
+        const { data: pessoasInside } = await supabase
+          .from('pessoas')
+          .select('*')
+          .in('id', pessoasIdsInside);
+        pessoasData = pessoasInside || [];
+      }
+
+      setMovimentacoes(movimentacoesAtivas || []);
+      setPessoas(pessoasData);
+
+      // Carregar tipos de pessoa em background
+      carregarTiposPessoa();
+
+      setTimeout(async () => {
+        try {
+          const [allPessoas, allMovimentacoes] = await Promise.all([
+            nuvraService.getPessoasPorEmpresa(empresaId),
+            nuvraService.getMovimentacoesPorEmpresa(empresaId)
+          ]);
+          
+          setPessoas(prev => prev.length < allPessoas.length ? allPessoas : prev);
+          setMovimentacoes(prev => prev.length < allMovimentacoes.length ? allMovimentacoes : prev);
+        } catch (bgError) {
+          console.warn('[NuvraContext] Background load failed:', bgError);
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error('[NuvraContext] Erro ao carregar dados:', error);
+    } finally {
+      setBusinessLoading(false);
+    }
+  };
 
   // Auth actions (delegate to useAuth)
   const login = useCallback(async (email: string, senha: string) => {
@@ -299,10 +351,10 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
     if (!authUser?.profile) return;
 
     try {
-      const allPessoas = await marinaService.getPessoasPorEmpresa(authUser.profile.empresa_id);
+      const allPessoas = await nuvraService.getPessoasPorEmpresa(authUser.profile.empresa_id);
       setPessoas(allPessoas);
     } catch (error) {
-      console.error('[MarinaContext] Erro ao atualizar pessoas:', error);
+      console.error('[NuvraContext] Erro ao atualizar pessoas:', error);
       toast.error('Erro ao atualizar dados de pessoas');
     }
   }, [authUser?.profile]);
@@ -320,7 +372,7 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
     );
 
     if (entradaAberta) {
-      return { pode: false, motivo: 'Esta pessoa já está dentro da marina' };
+      return { pode: false, motivo: 'Esta pessoa já está dentro do estabelecimento' };
     }
 
     return { pode: true };
@@ -407,20 +459,17 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
       }
 
       // Concatenar observação da saída com a observação existente da entrada
-      // NUNCA deixar observacao vazia ou null - sempre concatenar
       const observacaoEntrada = movimentacao.observacao || '';
       const observacaoSaida = (observacao || '').trim();
       const observacaoSaidaPadrao = "Saída finalizada";
       
       if (observacaoSaida !== '') {
-        // Se用户提供 observação de saída, concatenar
         if (observacaoEntrada !== '') {
           updateData.observacao = `${observacaoEntrada} | ${observacaoSaida}`;
         } else {
           updateData.observacao = observacaoSaida;
         }
       } else {
-        // Se observação não foi fornecida, usar observação padrão
         if (observacaoEntrada !== '') {
           updateData.observacao = `${observacaoEntrada} | ${observacaoSaidaPadrao}`;
         } else {
@@ -561,6 +610,33 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
       .sort((a, b) => new Date(b.entradaEm).getTime() - new Date(a.entradaEm).getTime());
   }, [movimentacoes, pessoas, empresaAtual]);
 
+  // Nova função: retorna todas as movimentações do dia atual (entradas e saídas)
+  const getMovimentacoesDoDia = useCallback((): MovimentacaoComPessoa[] => {
+    if (!empresaAtual) return [];
+
+    // Obter o início e fim do dia atual
+    const hoje = new Date();
+    const inicioDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0, 0);
+    const fimDoDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59, 999);
+
+    return movimentacoes
+      .filter(m => {
+        // Filtrar por empresa
+        if (m.empresa_id !== empresaAtual.id) return false;
+        
+        // Filtrar por data de entrada (hoje)
+        const entradaDate = new Date(m.entrada_em);
+        return entradaDate >= inicioDoDia && entradaDate <= fimDoDia;
+      })
+      .map(m => {
+        const pessoa = pessoas.find(p => p.id === m.pessoa_id);
+        if (!pessoa) return null;
+        return { ...m, pessoa };
+      })
+      .filter((item): item is MovimentacaoComPessoa => item !== null)
+      .sort((a, b) => new Date(b.entrada_em).getTime() - new Date(a.entrada_em).getTime());
+  }, [movimentacoes, pessoas, empresaAtual]);
+
   const getHistoricoMovimentacoes = useCallback((filtros?: HistoricoFiltros): MovimentacaoComPessoa[] => {
 
     if (!empresaAtual) {
@@ -628,7 +704,7 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
       );
 
       if (movimentacoesAtivas.length > 0) {
-        throw new Error('Não é possível excluir uma pessoa que tem movimentações ativas (dentro da marina)');
+        throw new Error('Não é possível excluir uma pessoa que tem movimentações ativas (dentro do estabelecimento)');
       }
 
       // Verificar se há movimentações associadas (para evitar violação de chave estrangeira)
@@ -844,7 +920,7 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
           const usuarios: AppUser[] = usuariosFiltrados.map(profile => ({
             id: profile.id,
             nome: profile.nome,
-            email: profile.id,
+            email: '',
             empresa_id: profile.empresa_id,
             role: profile.role as 'user' | 'admin' | 'owner',
             created_at: profile.created_at
@@ -856,7 +932,6 @@ export function MarinaProvider({ children }: { children: ReactNode }) {
       }
 
 // Se não encontrou usuários no banco, retorna array vazio
-// (Os usuários devem ser criados via Supabase Auth pelo painel admin)
 return [];
     } catch (err) {
       toast.error('Erro ao carregar usuários');
@@ -864,7 +939,7 @@ return [];
     }
   }, [authUser?.profile?.role, authUser?.profile?.empresa_id]);
 
-  const value: MarinaContextType = useMemo(() => ({
+  const value: NuvraContextType = useMemo(() => ({
     // Auth state from useAuth
     user: authUser?.profile || null,
     isAuthenticated,
@@ -893,8 +968,13 @@ return [];
     adicionarUsuario,
     removerUsuario,
     alterarSenhaUsuario,
+    tiposPessoa,
+    adicionarTipoPessoa,
+    removerTipoPessoa,
+    atualizarTipoPessoa,
     deletarEmpresa,
     getPessoasDentro,
+    getMovimentacoesDoDia,
     getHistoricoMovimentacoes,
     podeEntrar,
     getUsuarios,
@@ -909,6 +989,7 @@ return [];
     empresas,
     pessoas,
     movimentacoes,
+    tiposPessoa,
     empresaAtual,
     businessLoading,
 
@@ -926,6 +1007,9 @@ return [];
     adicionarUsuario,
     removerUsuario,
     alterarSenhaUsuario,
+    adicionarTipoPessoa,
+    removerTipoPessoa,
+    atualizarTipoPessoa,
     deletarEmpresa,
     getPessoasDentro,
     getHistoricoMovimentacoes,
@@ -934,16 +1018,16 @@ return [];
   ]);
 
   return (
-    <MarinaContext.Provider value={value}>
+    <NuvraContext.Provider value={value}>
       {children}
-    </MarinaContext.Provider>
+    </NuvraContext.Provider>
   );
 }
 
-export function useMarina() {
-  const context = useContext(MarinaContext);
+export function useNuvra() {
+  const context = useContext(NuvraContext);
   if (context === undefined) {
-    throw new Error('useMarina must be used within a MarinaProvider');
+    throw new Error('useNuvra must be used within a NuvraProvider');
   }
   return context;
 }

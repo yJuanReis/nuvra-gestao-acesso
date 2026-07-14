@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { LogOut, User, Clock, Car, Phone, FileText } from 'lucide-react';
-import { PessoaDentro } from '@/types/marina';
+import { PessoaDentro } from '@/types/nuvra';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatters } from '@/lib/validation';
@@ -18,7 +18,7 @@ interface RegistrarSaidaPersonalizadaModalProps {
 }
 
 export function RegistrarSaidaPersonalizadaModal({ open, onOpenChange, pessoaDentro }: RegistrarSaidaPersonalizadaModalProps) {
-  const { registrarSaida } = useMarina();
+  const { registrarSaida } = useNuvra();
   const [saidaEm, setSaidaEm] = useState('');
   const [observacao, setObservacao] = useState('');
   const [isLoading, setIsLoading] = useState(false);

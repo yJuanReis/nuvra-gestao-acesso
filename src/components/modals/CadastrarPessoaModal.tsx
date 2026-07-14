@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { FileText, Phone, Car, Users, Gift, Ship, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateCPF, validateRG, validatePlaca, formatName, formatPhone, formatPlaca } from '@/lib/validation';
@@ -16,11 +16,11 @@ interface CadastrarPessoaModalProps {
 }
 
 export function CadastrarPessoaModal({ open, onOpenChange, onCadastrarERegistrar, nomePreenchido }: CadastrarPessoaModalProps) {
-  const { cadastrarPessoa, pessoas, empresas, user } = useMarina();
+  const { cadastrarPessoa, pessoas, empresas, user, tiposPessoa } = useNuvra();
   const [formData, setFormData] = useState({
     nome: '',
     documento: '',
-    tipo: '' as 'cliente' | 'visita' | 'marinheiro' | 'proprietario' | 'colaborador' | '',
+    tipo: '',
     contato: '',
     placa: '',
   });
@@ -266,12 +266,9 @@ export function CadastrarPessoaModal({ open, onOpenChange, onCadastrarERegistrar
                   className="h-11 px-3 rounded-md border border-input bg-background text-sm flex-1"
                 >
                   <option value="">Selecione um tipo</option>
-                  <option value="cliente">Cliente</option>
-                  <option value="colaborador">Colaborador</option>
-                  <option value="marinheiro">Marinheiro</option>
-                  <option value="prestador">Prestador de Serviço</option>
-                  <option value="proprietario">Proprietário</option>
-                  <option value="visita">Visita</option>
+                  {tiposPessoa.map((tipo) => (
+                    <option key={tipo.id} value={tipo.nome}>{tipo.nome}</option>
+                  ))}
                 </select>
               </div>
             </div>

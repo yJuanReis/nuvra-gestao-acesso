@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { LogOut, Clock, Users } from 'lucide-react';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { toast } from 'sonner';
-import { marinaService } from '@/services/marinaService';
+import { nuvraService } from '@/services/nuvraService';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
@@ -11,7 +11,7 @@ interface SaidaAutomaticaButtonProps {
 }
 
 export function SaidaAutomaticaButton({ className }: SaidaAutomaticaButtonProps) {
-  const { empresaAtual, getPessoasDentro, setMovimentacoes } = useMarina();
+  const { empresaAtual, getPessoasDentro, setMovimentacoes } = useNuvra();
   const [isExecuting, setIsExecuting] = useState(false);
 
   const handleExecutarSaidaAutomatica = async () => {
@@ -24,11 +24,11 @@ export function SaidaAutomaticaButton({ className }: SaidaAutomaticaButtonProps)
       setIsExecuting(true);
       
       // Executar saída automática com 13 horas de limite
-      const pessoasRemovidas = await marinaService.executarSaidaAutomatica(empresaAtual.id, 13);
+      const pessoasRemovidas = await nuvraService.executarSaidaAutomatica(empresaAtual.id, 13);
       
       if (pessoasRemovidas > 0) {
         toast.success(
-          `Saída automática concluída! ${pessoasRemovidas} pessoa${pessoasRemovidas > 1 ? 's' : ''} removida${pessoasRemovidas > 1 ? 's' : ''} da marina.`,
+          `Saída automática concluída! ${pessoasRemovidas} pessoa${pessoasRemovidas > 1 ? 's' : ''} removida${pessoasRemovidas > 1 ? 's' : ''} do local.`,
           {
             duration: 5000,
             icon: <LogOut className="h-4 w-4" />
@@ -62,7 +62,7 @@ export function SaidaAutomaticaButton({ className }: SaidaAutomaticaButtonProps)
     }
   };
 
-  // Verificar se há pessoas dentro da marina
+  // Verificar se há pessoas dentro do local
   const pessoasDentro = getPessoasDentro();
   const temPessoasDentro = pessoasDentro.length > 0;
 
@@ -86,7 +86,7 @@ export function SaidaAutomaticaButton({ className }: SaidaAutomaticaButtonProps)
             <div className="text-xs opacity-75">
               {temPessoasDentro 
                 ? `${pessoasDentro.length} pessoa${pessoasDentro.length > 1 ? 's' : ''} dentro`
-                : 'Nenhuma pessoa na marina'
+                : 'Nenhuma pessoa no local'
               }
             </div>
           </div>

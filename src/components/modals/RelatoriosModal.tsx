@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useMarina } from '@/contexts/MarinaContext';
-import { marinaService } from '@/services/marinaService';
+import { useNuvra } from '@/contexts/NuvraContext';
+import { nuvraService } from '@/services/nuvraService';
 import { Calendar, Download, FileText, FileSpreadsheet, FileText as FileTextIcon, File, Download as DownloadIcon } from 'lucide-react';
 import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -71,7 +71,7 @@ const getAvailableYears = () => {
 };
 
 export function RelatoriosModal({ open, onOpenChange }: RelatoriosModalProps) {
-  const { user, empresas, pessoas, empresaAtual: empresaContext, refreshPessoas } = useMarina();
+  const { user, empresas, pessoas, empresaAtual: empresaContext, refreshPessoas } = useNuvra();
   
   // Valores iniciais: range do mês atual ao abrir o modal
   const getInitialFiltros = () => {
@@ -125,7 +125,7 @@ export function RelatoriosModal({ open, onOpenChange }: RelatoriosModalProps) {
 
       // Buscar movimentações via RPC (contorna limite de 1000 registros)
       // OPTIMIZED: Use streaming/chunks for large datasets
-      const movimentacoesFiltradas = await marinaService.getMovimentacoesPorPeriodo(
+      const movimentacoesFiltradas = await nuvraService.getMovimentacoesPorPeriodo(
         empresaAtual.id,
         dataInicioStr,
         dataFimStr,

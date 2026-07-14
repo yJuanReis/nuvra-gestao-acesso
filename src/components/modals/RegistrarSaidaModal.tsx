@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useMarina } from '@/contexts/MarinaContext';
+import { useNuvra } from '@/contexts/NuvraContext';
 import { LogOut, User, Clock, Car, Phone, MessageSquare, AlertCircle } from 'lucide-react';
-import { PessoaDentro } from '@/types/marina';
+import { PessoaDentro } from '@/types/nuvra';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -16,7 +16,7 @@ interface RegistrarSaidaModalProps {
 }
 
 export function RegistrarSaidaModal({ open, onOpenChange, pessoaDentro }: RegistrarSaidaModalProps) {
-  const { registrarSaida } = useMarina();
+  const { registrarSaida } = useNuvra();
   const [observacaoConfirm, setObservacaoConfirm] = useState<string>('');
   const [observacaoError, setObservacaoError] = useState<string>('');
 
@@ -110,7 +110,7 @@ export function RegistrarSaidaModal({ open, onOpenChange, pessoaDentro }: Regist
               </span>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Tempo na marina</p>
+              <p className="text-xs text-muted-foreground">Tempo no local</p>
               <p className="font-semibold text-primary text-lg">{tempoFormatado}</p>
             </div>
           </div>
