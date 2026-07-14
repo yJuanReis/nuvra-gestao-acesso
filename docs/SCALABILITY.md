@@ -10,7 +10,7 @@ Este documento descreve as otimizações implementadas para suportar escala de 1
 Índices otimizados para as principais queries:
 - `idx_movimentacoes_empresa_entrada` - Para queries por empresa ordenadas por data
 - `idx_movimentacoes_empresa_status` - Para filtrar status (DENTRO/FORA)
-- `idx_movimentacoes_dentro` - Composite index para pessoas dentro da marina
+- `idx_movimentacoes_dentro` - Composite index para pessoas dentro do estabelecimento
 - `idx_pessoas_empresa` - Para buscas de pessoas por empresa
 - `idx_pessoas_documento` - Para buscas por documento (CPF/CNPJ)
 
@@ -21,7 +21,7 @@ supabase db push
 ```
 
 ### 2. Bulk Operations na Saída Automática
-**Arquivo:** `src/services/marinaService.ts`
+**Arquivo:** `src/services/nuvraService.ts`
 
 **Antes:** Processamento sequencial (1 request por movimentação)
 ```typescript
@@ -40,7 +40,7 @@ await supabase.from('movimentacoes').upsert(updates, { onConflict: 'id' });
 **Impacto:** Redução de ~N segundos para ~1 segundo
 
 ### 3. Carregamento Inteligente no Context
-**Arquivo:** `src/contexts/MarinaContext.tsx`
+**Arquivo:** `src/contexts/NuvraContext.tsx`
 
 **Estratégia Two-Phase Loading:**
 

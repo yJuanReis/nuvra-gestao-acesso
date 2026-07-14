@@ -52,7 +52,6 @@ src/
 ├── contexts/           # Context API para estado global
 ├── lib/                # Bibliotecas e utilitários
 ├── types/              # Tipos TypeScript
-├── data/               # Dados mockados (desenvolvimento)
 └── styles/             # Estilos globais
 ```
 
@@ -108,7 +107,7 @@ export function Dashboard() {
 - **Real-time**: Sincronização em tempo real
 
 ### Gerenciamento de Estado
-- **Context API**: Estado global (MarinaContext)
+- **Context API**: Estado global (NuvraContext)
 - **TanStack Query**: Estado assíncrono
 - **React Hook Form**: Formulários
 
