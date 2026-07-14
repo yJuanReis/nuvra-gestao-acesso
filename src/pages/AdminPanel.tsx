@@ -102,6 +102,7 @@ export function AdminPanel() {
         const usuariosData = await getUsuarios();
         setUsuarios(usuariosData);
       } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
       } finally {
         setLoadingUsuarios(false);
       }
@@ -117,6 +118,7 @@ export function AdminPanel() {
       const usuariosData = await getUsuarios();
       setUsuarios(usuariosData);
     } catch (error) {
+      console.error('Erro ao recarregar usuários:', error);
     } finally {
       setLoadingUsuarios(false);
     }
@@ -129,6 +131,7 @@ export function AdminPanel() {
       await recarregarUsuarios();
       setShowDeleteAlert(null);
     } catch (error) {
+      console.error('Erro ao remover usuário:', error);
     }
   };
 
@@ -139,7 +142,7 @@ export function AdminPanel() {
   };
 
   // Pagination helpers
-  const getPaginatedItems = (items: any[], currentPage: number, pageSize: number) => {
+  const getPaginatedItems = <T,>(items: T[], currentPage: number, pageSize: number) => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return items.slice(startIndex, endIndex);
@@ -415,7 +418,7 @@ export function AdminPanel() {
                             </div>
 
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              {empresa.ativa ? 'Ativa' : 'Inativa'}
+                              Ativa
                             </Badge>
 
                             {(user?.role === 'admin' || empresa.id === user?.empresa_id) && (
@@ -688,7 +691,9 @@ export function AdminPanel() {
                           <PaginationNext
                             onClick={() => {
                               const filteredUsuarios = user?.role === 'owner' ? usuarios : usuarios.filter(u => u.empresa_id === user?.empresa_id);
-                              usuariosCurrentPage < getTotalPages(filteredUsuarios.length, usuariosPageSize) && setUsuariosCurrentPage(usuariosCurrentPage + 1);
+                              if (usuariosCurrentPage < getTotalPages(filteredUsuarios.length, usuariosPageSize)) {
+                                setUsuariosCurrentPage(usuariosCurrentPage + 1);
+                              }
                             }}
                             className={usuariosCurrentPage >= getTotalPages(user?.role === 'owner' ? usuarios.length : usuarios.filter(u => u.empresa_id === user?.empresa_id).length, usuariosPageSize) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                           />
@@ -930,6 +935,7 @@ export function AdminPanel() {
                   try {
                     await deletarEmpresa(showDeleteCompanyAlert);
                   } catch (error) {
+                    console.error('Erro ao deletar empresa:', error);
                   }
                   setShowDeleteCompanyAlert(null);
                 }
